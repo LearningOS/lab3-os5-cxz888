@@ -2,13 +2,13 @@
 #![no_main]
 #![feature(panic_info_message)]
 #![feature(alloc_error_handler)]
+#![feature(step_trait)]
 
-#[macro_use]
-extern crate bitflags;
-#[macro_use]
-extern crate log;
+use crate::task::{manager::TaskManager, Processor};
 
 extern crate alloc;
+extern crate bitflags;
+extern crate log;
 
 #[macro_use]
 mod console;
@@ -45,12 +45,11 @@ pub fn rust_main() -> ! {
     println!("[kernel] Hello, world!");
     mm::init();
     mm::remap_test();
-    task::add_initproc();
-    info!("after initproc!");
+    TaskManager::add_initproc();
+    log::info!("after initproc!");
     trap::init();
     trap::enable_timer_interrupt();
     timer::set_next_trigger();
     loader::list_apps();
-    task::run_tasks();
-    panic!("Unreachable in rust_main!");
+    Processor::run_tasks();
 }
